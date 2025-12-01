@@ -10,7 +10,7 @@ import {
 const router = express.Router();
 
 router.get("/", obtenerPacientes);
-router.post("/", registrarPaciente);
+router.post("/crear", registrarPaciente);
 router.put("/:id", actualizarPaciente);
 router.delete("/:id", eliminarPaciente);
 
