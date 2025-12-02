@@ -4,7 +4,7 @@ import { db } from "../db/db.js";
 
 const ATENCION_API_URL = (
   process.env.ATENCION_API_URL ||
-  "http://192.168.25.188:3000/api/atencion"
+  "apiatencionclinica.rtakabinetsolutions.com"
 ).replace(/\/$/, "");
 
 export const crearPresupuesto = async (req, res) => {

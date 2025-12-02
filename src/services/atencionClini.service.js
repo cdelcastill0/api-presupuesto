@@ -3,7 +3,7 @@ import fetch from "node-fetch";
 
 // Base del otro servicio (Atención Clínica)
 const ATENCION_CLINI_BASE_URL =
-  process.env.ATENCION_CLINI_BASE_URL || "http://192.168.25.188:3000";
+  process.env.ATENCION_CLINI_BASE_URL ||   "apiatencionclinica.rtakabinetsolutions.com";
 
 function buildUrl(path) {
   return `${ATENCION_CLINI_BASE_URL.replace(/\/$/, "")}${path}`;

@@ -3,7 +3,8 @@ import fetch from "node-fetch";
 import { db as pool } from "../db/db.js";
 
 // URL del servicio de Atención Clínica
-const ATENCION_API_URL = (process.env.ATENCION_API_URL || "http://192.168.25.188:3000").replace(
+const ATENCION_API_URL = (process.env.ATENCION_API_URL ||   "apiatencionclinica.rtakabinetsolutions.com"
+).replace(
   /\/$/,
   ""
 );
