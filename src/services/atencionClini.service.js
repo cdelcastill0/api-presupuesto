@@ -3,7 +3,7 @@ import fetch from "node-fetch";
 
 // Base del otro servicio (Atención Clínica)
 const ATENCION_CLINI_BASE_URL =
-  process.env.ATENCION_CLINI_BASE_URL ||   "htpp://apiatencionclinica.rtakabinetsolutions.com";
+  process.env.ATENCION_CLINI_BASE_URL ||   "http://apiatencionclinica.rtakabinetsolutions.com/api/atencion";
 
 function buildUrl(path) {
   return `${ATENCION_CLINI_BASE_URL.replace(/\/$/, "")}${path}`;
