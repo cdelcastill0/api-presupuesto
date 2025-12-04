@@ -5,6 +5,8 @@ import cors from "cors";
 import presupuestoRoutes from "./routes/presupuesto.routes.js";
 import pacienteRoutes from "./routes/paciente.routes.js";
 import integracionAtencionRoutes from "./routes/integracionAtencion.routes.js";
+import pacientesRouter from './routes/pacientes.routes.js';
+import cobrosRouter from './routes/cobros.routes.js';
 
 const app = express();
 
@@ -41,5 +43,12 @@ app.use("/api/pacientes", pacienteRoutes);
 
 // Integración con Atención Clínica (envío de catálogo de tratamientos)
 app.use(integracionAtencionRoutes);
+// Rutas
+app.use('/api/pacientes', pacientesRouter);
+app.use('/api/cobros', cobrosRouter);
 
+// Endpoint de salud para monitoreo
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok', service: 'caja' });
+});
 export default app;
