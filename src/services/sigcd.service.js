@@ -6,7 +6,7 @@ const sigcdBaseUrl = process.env.SIGCD_BASE_URL || 'https://gestion-citas-wmty.o
 
 const sigcdApi = axios.create({
   baseURL: sigcdBaseUrl,
-  timeout: 5000,
+  timeout: 8000, // Aumentar timeout a 8s
 });
 
 // Ya existe:
