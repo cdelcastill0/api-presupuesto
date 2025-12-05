@@ -3,6 +3,30 @@ import { pool } from '../config/db.js';
 import { obtenerPacientesDesdeSIGCD } from '../services/sigcd.service.js';
 
 /*
+ GET /api/pacientes
+ Obtiene todos los pacientes registrados en la BD de Caja
+*/
+export async function obtenerPacientes(req, res) {
+  try {
+    const [rows] = await pool.query(
+      `SELECT idPaciente, nombre, apellido, fecha_nac, direccion, correo 
+       FROM PACIENTE 
+       ORDER BY idPaciente DESC`
+    );
+
+    return res.json({
+      pacientes: rows,
+      total: rows.length
+    });
+  } catch (error) {
+    console.error('[Caja] Error obteniendo pacientes:', error);
+    return res.status(500).json({ 
+      error: 'Error interno del servidor al obtener pacientes' 
+    });
+  }
+}
+
+/*
  POST /api/pacientes
   Registra un paciente/cliente en la BD de Caja.
  

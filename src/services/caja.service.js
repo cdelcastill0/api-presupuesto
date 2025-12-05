@@ -3,12 +3,10 @@ import { pool } from "../config/db.js";
 
 
 export async function getPagosByPaciente(idPaciente) {
-  // La tabla en BD es `pago` y no guarda idPaciente; se relaciona vía presupuesto.
   const sql = `
     SELECT p.*
     FROM pago p
-    JOIN presupuesto pr ON p.idPresupuesto = pr.idPresupuesto
-    WHERE pr.idPaciente = ?
+    WHERE p.idPaciente = ?
     ORDER BY p.fechaPago DESC
   `;
   const [rows] = await pool.query(sql, [idPaciente]);
@@ -19,8 +17,7 @@ export async function getTotalPagado(idPaciente) {
   const sql = `
     SELECT IFNULL(SUM(p.monto), 0) AS totalPagado
     FROM pago p
-    JOIN presupuesto pr ON p.idPresupuesto = pr.idPresupuesto
-    WHERE pr.idPaciente = ?
+    WHERE p.idPaciente = ?
   `;
   const [rows] = await pool.query(sql, [idPaciente]);
   return rows[0].totalPagado;
@@ -60,10 +57,11 @@ export async function getSaldoPendiente(idPaciente) {
 
 export async function crearPago({ idPaciente, monto, metodoPago, idPresupuesto = null }) {
   const sql = `
-      INSERT INTO pago (idPresupuesto, fechaPago, monto, metodoPago, referencia)
-      VALUES (?, NOW(), ?, ?, NULL)
+      INSERT INTO pago (idPaciente, idPresupuesto, fechaPago, monto, metodoPago, referencia)
+      VALUES (?, ?, NOW(), ?, ?, NULL)
   `;
   const [result] = await pool.query(sql, [
+    idPaciente,
     idPresupuesto,
     monto,
     metodoPago,

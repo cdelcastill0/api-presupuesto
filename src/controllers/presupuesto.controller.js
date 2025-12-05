@@ -271,9 +271,17 @@ export const obtenerPresupuestoPorId = async (req, res) => {
 export const obtenerPresupuestos = async (req, res) => {
   try {
     const [rows] = await pool.query(
-      `SELECT idPresupuesto, idPaciente, fechaEmision, fechaVigencia, total, estadoPresupuesto
-       FROM presupuesto
-       ORDER BY fechaEmision DESC
+      `SELECT 
+        p.idPresupuesto, 
+        p.idPaciente, 
+        p.fechaEmision, 
+        p.fechaVigencia, 
+        p.total, 
+        p.estadoPresupuesto,
+        CONCAT(pa.nombre, ' ', COALESCE(pa.apellido, '')) as nombrePaciente
+       FROM presupuesto p
+       LEFT JOIN paciente pa ON p.idPaciente = pa.idPaciente
+       ORDER BY p.fechaEmision DESC
        LIMIT 200`
     );
 

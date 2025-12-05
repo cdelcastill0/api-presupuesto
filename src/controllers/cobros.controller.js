@@ -26,12 +26,12 @@ export async function crearCobro(req, res) {
   try {
     const { idCita, idPaciente, monto, metodoPago, idPresupuesto = null } = req.body || {};
 
-    const idCitaNum = parseInt(idCita, 10);
     const idPacienteNum = parseInt(idPaciente, 10);
     const montoNum = Number(monto);
+    const idCitaNum = idCita ? parseInt(idCita, 10) : null;
 
+    // Validar campos obligatorios (idCita es opcional)
     if (
-      Number.isNaN(idCitaNum) ||
       Number.isNaN(idPacienteNum) ||
       Number.isNaN(montoNum) ||
       montoNum <= 0 ||
@@ -39,35 +39,37 @@ export async function crearCobro(req, res) {
     ) {
       return res.status(400).json({
         error:
-          'idCita, idPaciente, monto (>0) y metodoPago son obligatorios y válidos',
+          'idPaciente, monto (>0) y metodoPago son obligatorios y válidos',
       });
     }
 
     // 1) Guardar el cobro en MySQL (Caja) usando el servicio centralizado `crearPago`
     const pago = await crearPago({
-      idPaciente: idPacienteNum, // opcional, se usa solo para validar entrada
+      idPaciente: idPacienteNum,
       monto: montoNum,
       metodoPago,
       idPresupuesto: idPresupuesto ? Number(idPresupuesto) : null,
     });
 
-    const idCobro = pago.idPago || pago.idCobro || null;
+    const idCobro = pago.idPago; // La tabla se llama pago y la PK es idPago
 
-    // 2) Intentar informar a SIGCD del pago
-    try {
-      await registrarPagoEnSIGCD({
-        idCita: idCitaNum,
-        idPaciente: idPacienteNum,
-        monto: montoNum,
-        metodoPago,
-        idCobroCaja: idCobro,
-      });
-    } catch (syncError) {
-      console.error(
-        '[Caja] Cobro creado, pero falló actualizar SIGCD:',
-        syncError.message
-      );
-      // Aquí podrías marcar algo en BD si quieres manejar "pendiente de sincronizar"
+    // 2) Intentar informar a SIGCD del pago (solo si hay idCita)
+    if (idCitaNum && !Number.isNaN(idCitaNum)) {
+      try {
+        await registrarPagoEnSIGCD({
+          idCita: idCitaNum,
+          idPaciente: idPacienteNum,
+          monto: montoNum,
+          metodoPago,
+          idCobroCaja: idCobro,
+        });
+      } catch (syncError) {
+        console.error(
+          '[Caja] Cobro creado, pero falló actualizar SIGCD:',
+          syncError.message
+        );
+        // Aquí podrías marcar algo en BD si quieres manejar "pendiente de sincronizar"
+      }
     }
 
     return res.status(201).json({
@@ -113,7 +115,7 @@ export async function obtenerComprobantePdf(req, res) {
     const id = Number(req.params.id);
     if (!id) return res.status(400).json({ error: 'ID inválido' });
 
-    // Traer pago + presupuesto + paciente para tener todos los campos necesarios en el comprobante
+    // Traer pago + paciente directamente (ahora pago tiene idPaciente)
     const [rowsPago] = await pool.query(
       `
       SELECT 
@@ -122,13 +124,12 @@ export async function obtenerComprobantePdf(req, res) {
         p.monto,
         p.metodoPago,
         p.referencia,
-        pr.idPresupuesto,
-        pr.idPaciente,
+        p.idPresupuesto,
+        p.idPaciente,
         pa.nombre,
         pa.apellido
       FROM pago p
-      JOIN presupuesto pr ON p.idPresupuesto = pr.idPresupuesto
-      LEFT JOIN paciente pa ON pr.idPaciente = pa.idPaciente
+      LEFT JOIN paciente pa ON p.idPaciente = pa.idPaciente
       WHERE p.idPago = ?
       `,
       [id]
