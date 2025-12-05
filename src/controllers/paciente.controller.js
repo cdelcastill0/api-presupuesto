@@ -1,5 +1,6 @@
 // src/controllers/paciente.controller.js
-import { db } from "../db/db.js";
+import { pool } from "../config/db.js";
+
 
 /**
  * NOTA ARQUITECTURA:
@@ -11,7 +12,7 @@ import { db } from "../db/db.js";
 
 export const obtenerPacientes = async (req, res) => {
   try {
-    const [pacientes] = await db.query(
+    const [pacientes] = await pool.query(
       "SELECT * FROM paciente ORDER BY idPaciente DESC"
     );
     res.json(pacientes);
@@ -24,22 +25,52 @@ export const obtenerPacientes = async (req, res) => {
 export const registrarPaciente = async (req, res) => {
   try {
     console.log("BODY RECIBIDO PACIENTE:", req.body);
-
     const { nombre, apellido, fecha_nac, direccion, correo } = req.body;
 
-    if (!nombre || !apellido || !fecha_nac) {
-      return res.status(400).json({
-        error: "Faltan datos obligatorios (nombre, apellido, fecha_nac).",
-      });
+    if (!nombre) {
+      return res.status(400).json({ error: "El campo 'nombre' es obligatorio." });
     }
 
-    const fechaRegistro = new Date();
+    // Detectar columnas existentes en la tabla `paciente`
+    const [colRows] = await pool.query("SHOW COLUMNS FROM paciente");
+    const existingCols = colRows.map((c) => c.Field);
 
-    await db.query(
-      `INSERT INTO paciente (nombre, apellido, fecha_nac, direccion, correo, fechaRegistro)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [nombre, apellido, fecha_nac, direccion, correo, fechaRegistro]
-    );
+    const insertCols = [];
+    const insertVals = [];
+
+    if (existingCols.includes("nombre")) {
+      insertCols.push("nombre");
+      insertVals.push(nombre);
+    }
+    if (existingCols.includes("apellido") && apellido) {
+      insertCols.push("apellido");
+      insertVals.push(apellido);
+    }
+    if (existingCols.includes("fecha_nac") && fecha_nac) {
+      insertCols.push("fecha_nac");
+      insertVals.push(fecha_nac);
+    }
+    if (existingCols.includes("direccion") && direccion) {
+      insertCols.push("direccion");
+      insertVals.push(direccion);
+    }
+    if (existingCols.includes("correo") && correo) {
+      insertCols.push("correo");
+      insertVals.push(correo);
+    }
+    if (existingCols.includes("fechaRegistro")) {
+      insertCols.push("fechaRegistro");
+      insertVals.push(new Date());
+    }
+
+    if (insertCols.length === 0) {
+      return res.status(500).json({ error: "Esquema de tabla paciente incompatible." });
+    }
+
+    const placeholders = insertCols.map(() => "?").join(", ");
+    const sql = `INSERT INTO paciente (${insertCols.join(", ")}) VALUES (${placeholders})`;
+
+    await pool.query(sql, insertVals);
 
     return res.json({ mensaje: "Paciente registrado correctamente ✔" });
   } catch (error) {
@@ -53,7 +84,7 @@ export const actualizarPaciente = async (req, res) => {
     const id = req.params.id;
     const { nombre, apellido, fecha_nac, direccion, correo } = req.body;
 
-    await db.query(
+    await pool.query(
       `UPDATE paciente
        SET nombre = ?, apellido = ?, fecha_nac = ?, direccion = ?, correo = ?
        WHERE idPaciente = ?`,
@@ -71,7 +102,7 @@ export const eliminarPaciente = async (req, res) => {
   try {
     const id = req.params.id;
 
-    await db.query("DELETE FROM paciente WHERE idPaciente = ?", [id]);
+    await pool.query("DELETE FROM paciente WHERE idPaciente = ?", [id]);
 
     res.json({ mensaje: "Paciente eliminado correctamente ❌" });
   } catch (error) {

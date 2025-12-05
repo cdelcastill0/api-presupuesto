@@ -3,6 +3,7 @@ import express from "express";
 import {
   crearPresupuesto,
   obtenerPresupuestoPorId,
+  obtenerPresupuestos,
 } from "../controllers/presupuesto.controller.js";
 
 const router = express.Router();
@@ -15,5 +16,8 @@ router.post("/crear", crearPresupuesto);
 
 // Servicio auxiliar para consultar un presupuesto concreto (PRESUPUESTO)
 router.get("/:id", obtenerPresupuestoPorId);
+
+// Listar presupuestos (para frontend)
+router.get("/", obtenerPresupuestos);
 
 export default router;

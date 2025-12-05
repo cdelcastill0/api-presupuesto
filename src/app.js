@@ -7,6 +7,7 @@ import pacienteRoutes from "./routes/paciente.routes.js";
 import integracionAtencionRoutes from "./routes/integracionAtencion.routes.js";
 import pacientesRouter from './routes/pacientes.routes.js';
 import cobrosRouter from './routes/cobros.routes.js';
+import saldoRoutes from "./routes/saldo.routes.js";
 
 const app = express();
 
@@ -39,13 +40,17 @@ app.use("/api/presupuestos", presupuestoRoutes);
 app.use("/api/presupuesto", presupuestoRoutes);
 
 // Gestión local de pacientes
-app.use("/api/pacientes", pacienteRoutes);
+//app.use("/api/pacientes", pacienteRoutes);
 
 // Integración con Atención Clínica (envío de catálogo de tratamientos)
 app.use(integracionAtencionRoutes);
 // Rutas
 app.use('/api/pacientes', pacientesRouter);
 app.use('/api/cobros', cobrosRouter);
+
+
+app.use("/api/saldo", saldoRoutes);
+
 
 // Endpoint de salud para monitoreo
 app.get('/health', (req, res) => {

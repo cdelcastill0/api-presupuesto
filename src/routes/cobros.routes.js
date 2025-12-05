@@ -1,15 +1,20 @@
 import { Router } from 'express';
 import {
   crearCobro,
-  listarCitasPendientes
+  listarCitasPendientes,
+  obtenerCobroPorId,
 } from '../controllers/cobros.controller.js';
 
 const router = Router();
-// get /api/cobros/citas-pendientes
+
+// GET /api/cobros/citas-pendientes
 router.get('/citas-pendientes', listarCitasPendientes);
-// post /api/cobros
+
+// POST /api/cobros
 router.post('/', crearCobro);
-/*ejemplo
+
+/*
+Ejemplo body:
 {
   "idCita": 19,
   "idPaciente": 1,
@@ -17,5 +22,29 @@ router.post('/', crearCobro);
   "metodoPago": "EFECTIVO"
 }
 */
+
+// Listar pagos por paciente: /api/cobros/list?pacienteId=1
+router.get('/list', async (req, res, next) => {
+  try {
+    const { listarPagos } = await import('../controllers/cobros.controller.js');
+    return listarPagos(req, res, next);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Obtener comprobante PDF de un cobro
+router.get('/:id/comprobante', async (req, res, next) => {
+  // delegar al controlador (se importa dinámicamente para evitar ciclos)
+  try {
+    const { obtenerComprobantePdf } = await import('../controllers/cobros.controller.js');
+    return obtenerComprobantePdf(req, res, next);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Obtener un cobro/pago por id
+router.get('/:id', obtenerCobroPorId);
 
 export default router;
