@@ -52,7 +52,7 @@ export async function crearPaciente(req, res) {
     // Inserta en la tabla de pacientes de Caja
     // Cambia "PACIENTE_CAJA" y las columnas si tu tabla se llama distinto.
     const [result] = await pool.query(
-    `INSERT INTO PACIENTE (nombre, apellido, fecha_nac, direccion, correo)
+    `INSERT INTO paciente (nombre, apellido, fecha_nac, direccion, correo)
     VALUES (?, ?, ?, ?, ?)`,
     [nombre, apellido, fecha_nac || null, direccion || null, correo || null]
   );
