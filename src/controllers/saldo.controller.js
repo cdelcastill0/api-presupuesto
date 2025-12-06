@@ -38,8 +38,7 @@ export const obtenerSaldoPorPaciente = async (req, res) => {
       SELECT 
         COALESCE(SUM(p.monto), 0) AS totalPagado
       FROM pago p
-      JOIN presupuesto pr ON p.idPresupuesto = pr.idPresupuesto
-      WHERE pr.idPaciente = ?
+      WHERE p.idPaciente = ?
       `,
       [idPaciente]
     );
