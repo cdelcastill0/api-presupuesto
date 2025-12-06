@@ -10,7 +10,7 @@ export async function obtenerPacientes(req, res) {
   try {
     const [rows] = await pool.query(
       `SELECT idPaciente, nombre, apellido, fecha_nac, direccion, correo 
-       FROM PACIENTE 
+       FROM paciente
        ORDER BY idPaciente DESC`
     );
 
@@ -100,7 +100,7 @@ export async function sincronizarPacientesDesdeSIGCD(req, res) {
 
       const [result] = await pool.query(
         `
-        INSERT INTO PACIENTE (
+        INSERT INTO paciente (
           idPaciente, nombre, apellido, fecha_nac, correo, direccion
         )
         VALUES (?, ?, ?, ?, ?, ?)
