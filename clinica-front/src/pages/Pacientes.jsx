@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 export default function Pacientes() {
-  const API = "http://localhost:3002/api/pacientes";
+  const API = "https://api-presupuesto.onrender.com/api/pacientes";
 
   const [pacientes, setPacientes] = useState([]);
   const [form, setForm] = useState({

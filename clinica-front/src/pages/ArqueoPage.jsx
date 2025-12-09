@@ -13,7 +13,7 @@ export default function ArqueoPage() {
   const [observaciones, setObservaciones] = useState("");
   const [guardando, setGuardando] = useState(false);
 
-  const API_URL = import.meta.env.VITE_CAJA_API_URL || "http://localhost:3002";
+  const API_URL = import.meta.env.VITE_CAJA_API_URL || "https://api-presupuesto.onrender.com";
 
   // Cargar historial de arqueos al montar
   useEffect(() => {
