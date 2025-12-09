@@ -9,6 +9,7 @@ import pacientesRouter from './routes/pacientes.routes.js';
 import cobrosRouter from './routes/cobros.routes.js';
 import saldoRoutes from "./routes/saldo.routes.js";
 import tratamientosSyncRoutes from './routes/tratamientosSync.routes.js';
+import arqueoRoutes from './routes/arqueo.routes.js';
 const app = express();
 
 // Middlewares globales
@@ -53,6 +54,8 @@ app.use("/api/saldo", saldoRoutes);
 
 
 app.use('/api/tratamientos', tratamientosSyncRoutes);
+
+app.use('/api/arqueo', arqueoRoutes);
 
 // Endpoint de salud para monitoreo
 app.get('/health', (req, res) => {
