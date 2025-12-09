@@ -19,7 +19,9 @@ export const generarArqueo = async (req, res) => {
 
         // Buscar el último arqueo guardado del día
         const [ultimosArqueos] = await pool.query(
-            `SELECT fecha, horaGeneracion, createdAt 
+            `SELECT DATE_FORMAT(fecha, '%Y-%m-%d') as fecha, 
+                    horaGeneracion, 
+                    createdAt 
              FROM arqueo 
              WHERE fecha = ? 
              ORDER BY createdAt DESC 
