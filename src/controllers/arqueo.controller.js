@@ -17,6 +17,8 @@ export const generarArqueo = async (req, res) => {
         const fechaHoy = ahora.toLocaleDateString('en-CA', opciones); // YYYY-MM-DD
         const horaActual = ahora.toLocaleTimeString('en-GB', { ...opciones, hour12: false }); // HH:MM:SS
 
+        console.log('📅 Fecha hoy:', fechaHoy, 'tipo:', typeof fechaHoy);
+
         // Buscar el último arqueo guardado del día
         const [ultimosArqueos] = await pool.query(
             `SELECT DATE_FORMAT(fecha, '%Y-%m-%d') as fecha, 
@@ -34,9 +36,11 @@ export const generarArqueo = async (req, res) => {
             // Si hay un arqueo previo hoy, contar desde ese momento
             const ultimoArqueo = ultimosArqueos[0];
             fechaDesde = `${ultimoArqueo.fecha} ${ultimoArqueo.horaGeneracion}`;
+            console.log('⏱️  Arqueo previo encontrado, fecha desde:', fechaDesde);
         } else {
             // Si no hay arqueo previo, contar desde el inicio del día
             fechaDesde = `${fechaHoy} 00:00:00`;
+            console.log('🆕 No hay arqueo previo, fecha desde:', fechaDesde);
         }
 
         // Consultar pagos desde el último arqueo hasta ahora
