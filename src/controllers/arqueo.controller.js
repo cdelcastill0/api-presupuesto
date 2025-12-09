@@ -21,9 +21,8 @@ export const generarArqueo = async (req, res) => {
 
         // Buscar el último arqueo guardado del día
         const [ultimosArqueos] = await pool.query(
-            `SELECT DATE_FORMAT(fecha, '%Y-%m-%d') as fecha, 
-                    horaGeneracion, 
-                    createdAt 
+            `SELECT CAST(DATE_FORMAT(fecha, '%Y-%m-%d') AS CHAR) as fecha, 
+                    horaGeneracion 
              FROM arqueo 
              WHERE fecha = ? 
              ORDER BY createdAt DESC 
@@ -35,11 +34,8 @@ export const generarArqueo = async (req, res) => {
         if (ultimosArqueos.length > 0) {
             // Si hay un arqueo previo hoy, contar desde ese momento
             const ultimoArqueo = ultimosArqueos[0];
-            // Asegurar que fecha sea string
-            const fechaStr = ultimoArqueo.fecha instanceof Date 
-                ? ultimoArqueo.fecha.toISOString().split('T')[0]
-                : ultimoArqueo.fecha;
-            fechaDesde = `${fechaStr} ${ultimoArqueo.horaGeneracion}`;
+            // La fecha ya viene como string gracias al CAST
+            fechaDesde = `${ultimoArqueo.fecha} ${ultimoArqueo.horaGeneracion}`;
             console.log('⏱️  Arqueo previo encontrado, fecha desde:', fechaDesde, 'tipo fecha:', typeof ultimoArqueo.fecha);
         } else {
             // Si no hay arqueo previo, contar desde el inicio del día
