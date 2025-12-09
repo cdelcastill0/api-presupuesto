@@ -18,13 +18,14 @@ export const generarArqueo = async (req, res) => {
         const horaActual = ahora.toLocaleTimeString('en-GB', { ...opciones, hour12: false }); // HH:MM:SS
 
         // Consultar pagos del día actual agrupados por método de pago
+        // Convertir fechaPago a zona horaria de México antes de comparar
         const query = `
             SELECT 
                 metodoPago,
                 COUNT(*) as cantidad,
                 SUM(monto) as total
             FROM pago
-            WHERE DATE(fechaPago) = ?
+            WHERE DATE(CONVERT_TZ(fechaPago, '+00:00', '-06:00')) = ?
             GROUP BY metodoPago
         `;
 
