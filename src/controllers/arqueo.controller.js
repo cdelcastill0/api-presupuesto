@@ -37,11 +37,13 @@ export const generarArqueo = async (req, res) => {
         resultados.forEach(row => {
             cantidadPagos += row.cantidad;
             
-            if (row.metodoPago === 'Efectivo') {
+            const metodo = row.metodoPago.toUpperCase();
+            
+            if (metodo === 'EFECTIVO') {
                 totalEfectivo = parseFloat(row.total || 0);
-            } else if (row.metodoPago === 'Tarjeta') {
+            } else if (metodo === 'TARJETA') {
                 totalTarjeta = parseFloat(row.total || 0);
-            } else if (row.metodoPago === 'Transferencia') {
+            } else if (metodo === 'TRANSFERENCIA') {
                 totalTransferencia = parseFloat(row.total || 0);
             }
         });
