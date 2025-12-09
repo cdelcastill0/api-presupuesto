@@ -1,6 +1,6 @@
 import { pool } from '../config/db.js';
 
-// Generar arqueo del día actual
+// Generar arqueo del día actual (v2.0 - fix datetime)
 export const generarArqueo = async (req, res) => {
     try {
         const { usuarioRegistro, observaciones } = req.body;
