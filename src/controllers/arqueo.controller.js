@@ -11,8 +11,11 @@ export const generarArqueo = async (req, res) => {
             });
         }
 
-        const fechaHoy = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-        const horaActual = new Date().toTimeString().split(' ')[0]; // HH:MM:SS
+        // Obtener fecha y hora en zona horaria de México (UTC-6)
+        const ahora = new Date();
+        const opciones = { timeZone: 'America/Mexico_City' };
+        const fechaHoy = ahora.toLocaleDateString('en-CA', opciones); // YYYY-MM-DD
+        const horaActual = ahora.toLocaleTimeString('en-GB', { ...opciones, hour12: false }); // HH:MM:SS
 
         // Consultar pagos del día actual agrupados por método de pago
         const query = `
