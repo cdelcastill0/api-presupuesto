@@ -35,8 +35,12 @@ export const generarArqueo = async (req, res) => {
         if (ultimosArqueos.length > 0) {
             // Si hay un arqueo previo hoy, contar desde ese momento
             const ultimoArqueo = ultimosArqueos[0];
-            fechaDesde = `${ultimoArqueo.fecha} ${ultimoArqueo.horaGeneracion}`;
-            console.log('⏱️  Arqueo previo encontrado, fecha desde:', fechaDesde);
+            // Asegurar que fecha sea string
+            const fechaStr = ultimoArqueo.fecha instanceof Date 
+                ? ultimoArqueo.fecha.toISOString().split('T')[0]
+                : ultimoArqueo.fecha;
+            fechaDesde = `${fechaStr} ${ultimoArqueo.horaGeneracion}`;
+            console.log('⏱️  Arqueo previo encontrado, fecha desde:', fechaDesde, 'tipo fecha:', typeof ultimoArqueo.fecha);
         } else {
             // Si no hay arqueo previo, contar desde el inicio del día
             fechaDesde = `${fechaHoy} 00:00:00`;
