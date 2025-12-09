@@ -17,7 +17,27 @@ export const generarArqueo = async (req, res) => {
         const fechaHoy = ahora.toLocaleDateString('en-CA', opciones); // YYYY-MM-DD
         const horaActual = ahora.toLocaleTimeString('en-GB', { ...opciones, hour12: false }); // HH:MM:SS
 
-        // Consultar pagos del día actual agrupados por método de pago
+        // Buscar el último arqueo guardado del día
+        const [ultimosArqueos] = await pool.query(
+            `SELECT fecha, horaGeneracion, createdAt 
+             FROM arqueo 
+             WHERE fecha = ? 
+             ORDER BY createdAt DESC 
+             LIMIT 1`,
+            [fechaHoy]
+        );
+
+        let fechaDesde;
+        if (ultimosArqueos.length > 0) {
+            // Si hay un arqueo previo hoy, contar desde ese momento
+            const ultimoArqueo = ultimosArqueos[0];
+            fechaDesde = `${ultimoArqueo.fecha} ${ultimoArqueo.horaGeneracion}`;
+        } else {
+            // Si no hay arqueo previo, contar desde el inicio del día
+            fechaDesde = `${fechaHoy} 00:00:00`;
+        }
+
+        // Consultar pagos desde el último arqueo hasta ahora
         // Convertir fechaPago a zona horaria de México antes de comparar
         const query = `
             SELECT 
@@ -25,11 +45,12 @@ export const generarArqueo = async (req, res) => {
                 COUNT(*) as cantidad,
                 SUM(monto) as total
             FROM pago
-            WHERE DATE(CONVERT_TZ(fechaPago, '+00:00', '-06:00')) = ?
+            WHERE CONVERT_TZ(fechaPago, '+00:00', '-06:00') > ?
+              AND DATE(CONVERT_TZ(fechaPago, '+00:00', '-06:00')) = ?
             GROUP BY metodoPago
         `;
 
-        const [resultados] = await pool.query(query, [fechaHoy]);
+        const [resultados] = await pool.query(query, [fechaDesde, fechaHoy]);
 
         // Inicializar totales
         let totalEfectivo = 0;
